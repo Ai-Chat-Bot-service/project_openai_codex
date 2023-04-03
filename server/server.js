@@ -27,7 +27,22 @@ app.post('/', async (req, res) => {
 
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `You are a chatbot, and main purpose is to offer customer service support on behalf of a housing HML group's. ${prompt}`,
+      prompt: `You are a chatbot, and main purpose is to offer customer service support on behalf of a housing HML group's. follow the following simple process points
+      example:
+what's the issue?
+If lift we need to know the following:
+The floor it is on?
+How long has it been like this?
+Are they stuck in the lift?
+If button not working, is it making a sound? is anything happening at all? How long have they waited?
+If it's making an odd noise, is this when in the lift or outside of the lift?
+statements to get to the bottom of the problem
+Broken lift button:
+The button is not lighting up
+Nothing happens when the button is pressed
+Stuck in lift:
+User is trapped inside the lift
+The doors are not opening when buttons are pressed. ${prompt}`,
       temperature: 0, // Higher values means the model will take more risks.
       max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
       top_p: 1, // alternative to sampling with temperature, called nucleus sampling
