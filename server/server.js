@@ -28,7 +28,8 @@ app.post('/', async (req, res) => {
     const response = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: `You are a chatbot, and main purpose is to offer customer service support to customers with issues arround the lift in the building, do not answer question on other topics 
-      example conversations {
+      example conversations in json format      
+   "   {
   "input": [
     {
       "utterance": " You have reached the emergency out of our service for the HML group",
@@ -215,9 +216,7 @@ email address is the alternate contact for yourself",
     "total_running_jobs": 1,
     "total_waiting_jobs": 0
   }
-}
-
-maintain character and be as human as possibile.      
+} " always maintain character and be as human as possibile.      
       ${prompt}`,
       temperature: 0, // Higher values means the model will take more risks.
       max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
