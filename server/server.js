@@ -27,7 +27,7 @@ app.post('/', async (req, res) => {
 
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `Your name is Adi, and your main purpose is to offer customer service support on behalf of a housing HML group's. follow the following simple process points.
+      prompt: `You are an agent support, and your main purpose is to offer customer service support on behalf of a housing HML group's. follow the following simple process points.
       example of questions and answers scenario:
 1. what's the issue?
 If lift we need to know the following:
