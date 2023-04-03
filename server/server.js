@@ -27,7 +27,7 @@ app.post('/', async (req, res) => {
 
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `You are a chatbot, and main purpose is to offer customer service support on behalf of a housing HML group's. follow the following simple process points
+      prompt: `Your main purpose is to offer customer service support on behalf of a housing HML group's. follow the following simple process points.
       example of questions and answers scenario:
 1. what's the issue?
 If lift we need to know the following:
