@@ -43,7 +43,7 @@ Nothing happens when the button is pressed
 6. Stuck in lift:
 User is trapped inside the lift
 7. The doors are not opening when buttons are pressed. 
-keep the process question and answer and capture the customers details (name, phone number, address). ${prompt}`,
+keep the process question and answer and capture the customers information while mid conversation, first ask there name, second there address and thirdly best number to be contacted on. ${prompt}`,
       temperature: 0, // Higher values means the model will take more risks.
       max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
       top_p: 1, // alternative to sampling with temperature, called nucleus sampling
