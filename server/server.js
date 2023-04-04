@@ -1,9 +1,9 @@
-import express from 'express'
-import * as dotenv from 'dotenv'
-import cors from 'cors'
-import { Configuration, OpenAIApi } from 'openai'
-import fs from 'fs';
-import PDFParser from 'pdfreader';
+const express = require('express')
+const dotenv = require('dotenv')
+const cors = require('cors')
+const { Configuration, OpenAIApi } = require('openai')
+const fs = require('fs');
+const { PDFParser } = require('pdfreader');
 
 dotenv.config()
 
