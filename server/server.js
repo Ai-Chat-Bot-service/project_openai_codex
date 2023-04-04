@@ -35,15 +35,12 @@ new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
   }
 });
 
-app.get('/', async (req, res) => {
-  res.status(200).send({
-    message: 'Hello from CodeX!'
-  });
-});
+let isFirstPrompt = true;
 
 app.post('/', async (req, res) => {
   try {
-    const prompt = req.body.prompt;
+    const prompt = isFirstPrompt ? `${pdfText} ${req.body.prompt}` : req.body.prompt;
+    isFirstPrompt = false;
 
     // Use the extracted text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
