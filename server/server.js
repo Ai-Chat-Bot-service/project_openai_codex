@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -18,17 +19,16 @@ app.use(cors());
 app.use(express.json());
 
 let pdfText = '';
-const filePath = `${__dirname}/example.pdf`;
+const filePath = path.join(__dirname, 'example.pdf');
 
 // Extract text content from the PDF file
-const pdfParser = new pdfreader.PdfReader();
-pdfParser.parseFileItems(filePath, function (err, item) {
+new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
   if (err) {
     console.error(err);
     return;
   }
   else if (!item) {
-    console.log('PDF parsing complete');
+    app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
   }
   else if (item.text) {
     pdfText += item.text;
@@ -68,6 +68,4 @@ app.post('/', async (req, res) => {
     console.error(error);
     res.status(500).send('Something went wrong');
   }
-});
-
-app.listen(5000, () => console.log('AI server started on http://localhost:5000'))
+})
