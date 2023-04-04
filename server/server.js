@@ -17,7 +17,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let pdfText = ''; // declare the global variable to store extracted PDF text
+let pdfText = '';
+const filePath = `${__dirname}/example.pdf`;
+
+// Extract text content from the PDF file
+new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  else if (!item) {
+    app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
+  }
+  else if (item.text) {
+    pdfText += item.text;
+  }
+});
 
 app.get('/', async (req, res) => {
   res.status(200).send({
@@ -39,34 +54,17 @@ app.post('/', async (req, res) => {
       frequency_penalty: 0.5,
       presence_penalty: 0,
     })
-    .then(response => {
-      res.status(200).send({
-        bot: response.data.choices[0].text
+      .then(response => {
+        res.status(200).send({
+          bot: response.data.choices[0].text
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(500).send('Something went wrong');
       });
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Something went wrong');
-    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Something went wrong');
   }
 });
-
-// Extract text content from the PDF file on server start
-const filePath = __dirname + '/example.pdf'; // Replace with the actual file path of your PDF file
-new pdfreader.PdfReader().parseFileItems(filePath, function(err, item){
-  if (err){
-    console.error(err);
-    return;
-  }
-  else if (!item){
-    console.log('Finished parsing the PDF file');
-  }
-  else if (item.text){
-    pdfText += item.text;
-  }
-});
-
-app.listen(5000, () => console.log('AI server started on http://localhost:5000'))
