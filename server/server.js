@@ -34,10 +34,12 @@ app.post('/', async (req, res) => {
       pdfText += text;
     });
     parser.on('end', async function() {
-      // Use the extracted text as the prompt in your OpenAI API request
+      const prompt = req.body.prompt;
+
+      // Use the extracted text and user input prompt as the prompt in your OpenAI API request
       const response = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: pdfText,
+        prompt: `${pdfText} ${prompt}`,
         temperature: 0,
         max_tokens: 3000,
         top_p: 1,
