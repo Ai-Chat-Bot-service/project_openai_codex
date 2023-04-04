@@ -1,8 +1,8 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { Configuration, OpenAIApi } from 'openai';
 import pdfreader from 'pdfreader';
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs';
 
 dotenv.config();
@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.get('/', async (req, res) => {
   res.status(200).send({
-    message: 'Hello from CodeX!',
+    message: 'Hello from CodeX!'
   });
 });
 
@@ -27,18 +27,19 @@ app.post('/', async (req, res) => {
   try {
     const filePath = './server/example.pdf'; // Replace with the actual file path of your PDF file
     const parser = new pdfreader.PdfReader();
-
-    // Extract text content from the PDF file
     let pdfText = '';
-    parser.on('text', function (chunk) {
-      pdfText += chunk;
+
+    parser.on('pdfParser_dataReady', function(data) {
+      const pageText = data.formImage.Pages.map(page => page.Texts.map(text => decodeURIComponent(text.R[0].T)).join('')).join('');
+      pdfText += pageText;
     });
-    parser.on('end', async function () {
+
+    parser.on('pdfParser_end', async function() {
       const prompt = req.body.prompt;
 
       // Use the extracted text and user input prompt as the prompt in your OpenAI API request
       const response = await openai.createCompletion({
-        model: 'text-davinci-002',
+        model: "text-davinci-003",
         prompt: `${pdfText} ${prompt}`,
         temperature: 0,
         max_tokens: 3000,
@@ -48,10 +49,10 @@ app.post('/', async (req, res) => {
       });
 
       res.status(200).send({
-        bot: response.data.choices[0].text,
+        bot: response.data.choices[0].text
       });
     });
-    parser.parseBuffer(fs.readFileSync(filePath));
+    parser.loadBuffer(fs.readFileSync(filePath));
 
   } catch (error) {
     console.error(error);
