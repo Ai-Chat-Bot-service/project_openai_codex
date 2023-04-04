@@ -25,7 +25,7 @@ app.get('/', async (req, res) => {
 
 app.post('/', async (req, res) => {
   try {
-    const filePath = __dirname + '/example.pdf'; // Replace with the actual file path of your PDF file
+    const filePath = new URL('./example.pdf', import.meta.url); // Replace with the actual file path of your PDF file
     let pdfText = '';
 
     // Extract text content from the PDF file
