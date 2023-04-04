@@ -48,7 +48,7 @@ app.post('/', async (req, res) => {
     // Use the extracted text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `${pdfText} ${prompt}`,
+      prompt: `${prompt}`,
       temperature: 0,
       max_tokens: 3000,
       top_p: 1,
