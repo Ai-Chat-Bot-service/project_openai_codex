@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs';
+import path from 'path';
 import session from 'express-session';
 
 dotenv.config();
@@ -18,7 +19,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(session({
-  secret: 'mysecret',
+  secret: 'secret-key',
   resave: false,
   saveUninitialized: true
 }));
@@ -31,16 +32,8 @@ app.get('/', async (req, res) => {
 
 app.post('/', async (req, res) => {
   try {
-    const filePath = __dirname + '/example.pdf'; // Replace with the actual file path of your PDF file
+    const filePath = path.join(path.dirname(new URL(import.meta.url).pathname), 'example.pdf');
     let pdfText = '';
-
-    // Check if the PDF file has already been processed for the current user
-    if (req.session.processed) {
-      res.status(200).send({
-        bot: 'PDF file already processed'
-      });
-      return;
-    }
 
     // Extract text content from the PDF file
     new pdfreader.PdfReader().parseFileItems(filePath, function(err, item){
@@ -64,9 +57,6 @@ app.post('/', async (req, res) => {
           presence_penalty: 0,
         })
         .then(response => {
-          // Mark the PDF file as processed for the current user
-          req.session.processed = true;
-
           res.status(200).send({
             bot: response.data.choices[0].text
           });
