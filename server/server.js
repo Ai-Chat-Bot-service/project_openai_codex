@@ -1,4 +1,4 @@
-import { PDFParser } from 'pdfreader';
+import pdfreader from 'pdfreader';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -26,7 +26,7 @@ app.get('/', async (req, res) => {
 app.post('/', async (req, res) => {
   try {
     const filePath = './server/example.pdf'; // Replace with the actual file path of your PDF file
-    const parser = new PDFParser();
+    const parser = new pdfreader.PDFParser();
 
     // Extract text content from the PDF file
     let pdfText = '';
