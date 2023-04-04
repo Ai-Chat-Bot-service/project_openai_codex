@@ -26,38 +26,47 @@ app.get('/', async (req, res) => {
 app.post('/', async (req, res) => {
   try {
     const filePath = './server/example.pdf'; // Replace with the actual file path of your PDF file
-    const parser = new pdfreader.PdfReader();
     let pdfText = '';
 
-    parser.on('pdfParser_dataReady', function(data) {
-      const pageText = data.formImage.Pages.map(page => page.Texts.map(text => decodeURIComponent(text.R[0].T)).join('')).join('');
-      pdfText += pageText;
+    // Extract text content from the PDF file
+    new pdfreader.PdfReader().parseFileItems(filePath, function(err, item){
+      if (err){
+        console.error(err);
+        res.status(500).send('Something went wrong');
+        return;
+      }
+      else if (!item){
+        // Finished parsing the PDF file
+        const prompt = req.body.prompt;
+
+        // Use the extracted text and user input prompt as the prompt in your OpenAI API request
+        openai.createCompletion({
+          model: "text-davinci-003",
+          prompt: `${pdfText} ${prompt}`,
+          temperature: 0,
+          max_tokens: 3000,
+          top_p: 1,
+          frequency_penalty: 0.5,
+          presence_penalty: 0,
+        })
+        .then(response => {
+          res.status(200).send({
+            bot: response.data.choices[0].text
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          res.status(500).send('Something went wrong');
+        });
+      }
+      else if (item.text){
+        pdfText += item.text;
+      }
     });
-
-    parser.on('pdfParser_end', async function() {
-      const prompt = req.body.prompt;
-
-      // Use the extracted text and user input prompt as the prompt in your OpenAI API request
-      const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: `${pdfText} ${prompt}`,
-        temperature: 0,
-        max_tokens: 3000,
-        top_p: 1,
-        frequency_penalty: 0.5,
-        presence_penalty: 0,
-      });
-
-      res.status(200).send({
-        bot: response.data.choices[0].text
-      });
-    });
-    parser.loadBuffer(fs.readFileSync(filePath));
-
   } catch (error) {
     console.error(error);
-    res.status(500).send(error || 'Something went wrong');
+    res.status(500).send('Something went wrong');
   }
 });
 
-app.listen(5000, () => console.log('AI server started on http://localhost:5000'))
+app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
