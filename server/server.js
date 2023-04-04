@@ -2,6 +2,7 @@ import express from 'express'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
 import { Configuration, OpenAIApi } from 'openai'
+import fs from 'fs'
 
 dotenv.config()
 
@@ -15,15 +16,18 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+const initialPrompt = `Prompt from example.pdf: ${fs.readFileSync('example.pdf', 'utf8')}\n`
+
 app.get('/', async (req, res) => {
   res.status(200).send({
-    message: 'Hello from CodeX!'
+    message: 'Hello from CodeX!',
+    initialPrompt: initialPrompt
   })
 })
 
 app.post('/', async (req, res) => {
   try {
-    const prompt = req.body.prompt;
+    const prompt = initialPrompt + req.body.prompt;
 
     const response = await openai.createCompletion({
       model: "text-davinci-003",
