@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 let pdfText = '';
-const filePath = new URL('example.pdf', import.meta.url).pathname;
+const filePath = new URL('example1.pdf', import.meta.url).pathname;
 
 // Extract text content from the PDF file
 new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
