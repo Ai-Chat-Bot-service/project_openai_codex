@@ -18,16 +18,17 @@ app.use(cors());
 app.use(express.json());
 
 let pdfText = '';
-const filePath = `${process.cwd()}/example.pdf`;
+const filePath = `${__dirname}/example.pdf`;
 
 // Extract text content from the PDF file
-new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
+const pdfParser = new pdfreader.PdfReader();
+pdfParser.parseFileItems(filePath, function (err, item) {
   if (err) {
     console.error(err);
     return;
   }
   else if (!item) {
-    app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
+    console.log('PDF parsing complete');
   }
   else if (item.text) {
     pdfText += item.text;
@@ -68,3 +69,5 @@ app.post('/', async (req, res) => {
     res.status(500).send('Something went wrong');
   }
 });
+
+app.listen(5000, () => console.log('AI server started on http://localhost:5000'))
