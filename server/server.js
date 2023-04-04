@@ -24,10 +24,11 @@ const pdfText = {
 
 const fileNames = Object.keys(pdfText);
 
-const filePaths = fileNames.reduce((result, fileName) => {
-  result[fileName] = path.join(__dirname, `${fileName}.pdf`);
+const filePaths = ['example', 'example2'].reduce((result, fileName) => {
+  result[fileName] = new URL(`${fileName}.pdf`, import.meta.url).pathname;
   return result;
 }, {});
+
 
 const loadPdf = (fileName) => {
   const filePath = filePaths[fileName];
