@@ -20,7 +20,7 @@ app.use(express.json());
 
 let pdfText = '';
 let currentFileIndex = 0;
-const fileNames = ['example1.pdf', 'example2.pdf'];
+const fileNames = ['example1.pdf'];
 const filePath = new URL(fileNames[currentFileIndex], import.meta.url).pathname;
 
 // Extract text content from the PDF file
