@@ -19,7 +19,9 @@ app.use(cors());
 app.use(express.json());
 
 let pdfText = '';
-const filePath = new URL('example1.pdf', import.meta.url).pathname;
+let currentFileIndex = 0;
+const fileNames = ['example1.pdf', 'example2.pdf'];
+const filePath = new URL(fileNames[currentFileIndex], import.meta.url).pathname;
 
 // Extract text content from the PDF file
 new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
@@ -56,6 +58,27 @@ app.post('/', async (req, res) => {
         res.status(200).send({
           bot: response.data.choices[0].text
         });
+
+        // Switch to the next file after sending the first response
+        if (isFirstPrompt) {
+          currentFileIndex++;
+          if (currentFileIndex < fileNames.length) {
+            pdfText = '';
+            const newFilePath = new URL(fileNames[currentFileIndex], import.meta.url).pathname;
+            new pdfreader.PdfReader().parseFileItems(newFilePath, function (err, item) {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              else if (!item) {
+                console.log(`Switched to ${fileNames[currentFileIndex]}`);
+              }
+              else if (item.text) {
+                pdfText += item.text;
+              }
+            });
+          }
+        }
       })
       .catch(error => {
         console.error(error);
@@ -65,4 +88,4 @@ app.post('/', async (req, res) => {
     console.error(error);
     res.status(500).send('Something went wrong');
   }
-})
+});
