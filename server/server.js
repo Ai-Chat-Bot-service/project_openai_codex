@@ -46,7 +46,7 @@ app.post('/', async (req, res) => {
 
     // Use the extracted text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
-      model: "gpt-3.5-turbo",
+      model: "text-davinci-003",
       prompt: `${prompt}`,
       temperature: 0,
       max_tokens: 3000,
