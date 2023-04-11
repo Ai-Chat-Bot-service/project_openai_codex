@@ -32,12 +32,12 @@ app.post('/', async (req, res) => {
 
     // Use the text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
-      model: "gpt-3.5-turbo-0301",
+      model: "gpt-3.5-turbo",
       prompt: `${prompt}`,
-      temperature: 0.5,
+      temperature: 0,
       max_tokens: 3000,
       top_p: 1,
-      frequency_penalty: 0.7,
+      frequency_penalty: 0,
       presence_penalty: 0,
     })
       .then(response => {
