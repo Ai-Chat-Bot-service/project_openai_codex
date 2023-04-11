@@ -1,10 +1,7 @@
-import pdfreader from 'pdfreader';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { Configuration, OpenAIApi } from 'openai';
-import fs from 'fs';
-import path from 'path';
 
 dotenv.config();
 
@@ -18,33 +15,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let pdfText = '';
-let currentFileIndex = 0;
-const fileNames = ['example1.pdf'];
-const filePath = new URL(fileNames[currentFileIndex], import.meta.url).pathname;
-
-// Extract text content from the PDF file
-new pdfreader.PdfReader().parseFileItems(filePath, function (err, item) {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  else if (!item) {
-    app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
-  }
-  else if (item.text) {
-    pdfText += item.text;
-  }
-});
-
 let isFirstPrompt = true;
+let textPromptSent = false;
 
 app.post('/', async (req, res) => {
   try {
-    const prompt = isFirstPrompt ? `${pdfText} ${req.body.prompt}` : req.body.prompt;
-    isFirstPrompt = false;
+    let prompt = '';
 
-    // Use the extracted text and user input prompt as the prompt in your OpenAI API request
+    if (isFirstPrompt && !textPromptSent) {
+      prompt = req.body.text;
+      textPromptSent = true;
+    } else {
+      prompt = req.body.prompt;
+    }
+
+    // Use the text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
       model: "text-davinci-003",
       prompt: `${prompt}`,
@@ -59,25 +44,8 @@ app.post('/', async (req, res) => {
           bot: response.data.choices[0].text
         });
 
-        // Switch to the next file after sending the first response
         if (isFirstPrompt) {
-          currentFileIndex++;
-          if (currentFileIndex < fileNames.length) {
-            pdfText = '';
-            const newFilePath = new URL(fileNames[currentFileIndex], import.meta.url).pathname;
-            new pdfreader.PdfReader().parseFileItems(newFilePath, function (err, item) {
-              if (err) {
-                console.error(err);
-                return;
-              }
-              else if (!item) {
-                console.log(`Switched to ${fileNames[currentFileIndex]}`);
-              }
-              else if (item.text) {
-                pdfText += item.text;
-              }
-            });
-          }
+          isFirstPrompt = false;
         }
       })
       .catch(error => {
@@ -89,3 +57,5 @@ app.post('/', async (req, res) => {
     res.status(500).send('Something went wrong');
   }
 });
+
+app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
