@@ -15,48 +15,38 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let isFirstPrompt = true;
-let textPromptSent = false;
-let firstPrompt = "You are playing the role of customer service support agent named Adi for a property management company. Always welcome the person with: Hi my name is Adi, I’m your AI personal property assistant. How can I help? Politely take the conversation back to the property. you must ask enough questions to accurately diagnose the issue, this might require multiple questions, but always ask one question at a time. Refer user to calling 08000397262 to speak with an agent in all circumstances. If asked how long until it will be resolved, politely advice you are unable to provide a definite resolution time, but reassure that the property management team will be in touch shortly with more information. Limit responses to 100 characters.";
+let conversationHistory = [];
 
-app.post('/', async (req, res) => {
+app.post('/chat', async (req, res) => {
   try {
-    let prompt = '';
+    const { message, context } = req.body;
 
-    if (isFirstPrompt && !textPromptSent) {
-      prompt = firstPrompt;
-      textPromptSent = true;
-    } else {
-      prompt = req.body.prompt;
-    }
+    // Construct the prompt based on the conversation history and user input
+    let prompt = conversationHistory.reduce((acc, cur) => `${acc}${cur}`, '');
+    prompt += message;
 
-    // Use the text and user input prompt as the prompt in your OpenAI API request
-    openai.createCompletion({
-      model: "gpt-3.5-turbo",
-      prompt: `${prompt}`,
-      temperature: 0,
-      max_tokens: 3000,
+    // Use the prompt and conversation history as inputs to the OpenAI API
+    const response = await openai.createCompletion({
+      model: 'gpt-3.5-turbo',
+      prompt,
+      temperature: 0.7,
+      max_tokens: 150,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
-    })
-      .then(response => {
-        res.status(200).send({
-          bot: response.data.choices[0].text
-        });
+      stop: ['\n']
+    });
 
-        if (isFirstPrompt) {
-          isFirstPrompt = false;
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).send('Something went wrong');
-      });
+    // Extract the bot's response and add it to the conversation history
+    const botResponse = response.data.choices[0].text.trim();
+    conversationHistory.push(`${message}\n${botResponse}\n`);
+
+    // Send the bot's response back to the client
+    res.status(200).json({ message: botResponse });
   } catch (error) {
     console.error(error);
     res.status(500).send('Something went wrong');
   }
 });
 
-app.listen(5000, () => console.log('AI server started on http://localhost:5000'));
+app.listen(5000, () => console.log('AI chat server started on http://localhost:5000'));
