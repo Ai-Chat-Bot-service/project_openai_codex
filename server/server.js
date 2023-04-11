@@ -22,7 +22,7 @@ app.post('/chat', async (req, res) => {
     const { message, context } = req.body;
 
     // Construct the prompt based on the conversation history and user input
-    let prompt = conversationHistory.reduce((acc, cur) => `${acc}${cur}`, '');
+    let prompt = context.reduce((acc, cur) => `${acc}${cur.botMessage}\n${cur.message}\n`, '');
     prompt += message;
 
     // Use the prompt and conversation history as inputs to the OpenAI API
@@ -39,7 +39,7 @@ app.post('/chat', async (req, res) => {
 
     // Extract the bot's response and add it to the conversation history
     const botResponse = response.data.choices[0].text.trim();
-    conversationHistory.push(`${message}\n${botResponse}\n`);
+    conversationHistory.push({ message, botMessage: botResponse });
 
     // Send the bot's response back to the client
     res.status(200).json({ message: botResponse });
