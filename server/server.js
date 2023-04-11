@@ -31,8 +31,8 @@ app.post('/', async (req, res) => {
 
     // Use the text and user input prompt as the prompt in your OpenAI API request
     openai.createCompletion({
-      model: "gpt-3.5-turbo",
-      prompt: `${prompt}`,
+      model: "text-davinci-003",
+      prompt: `You are playing the role of customer service support agent for a property management company. Always welcome the person with: hi my name is Adi, I’m your AI personal property assistant. How can I help. ${prompt}`,
       temperature: 0.5,
       max_tokens: 3000,
       top_p: 1,
